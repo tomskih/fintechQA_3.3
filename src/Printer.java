@@ -1,14 +1,14 @@
 import java.util.Scanner;
 
 public class Printer {
-    static char button;
+    static boolean isPrint;
     int countOfPaper = 0;   //количество бумаги в принтере
     public static final int maxCountOfPaper = 100;    //максимально возможно количество загруженной бумаги
 
     public static void main(String[] args) throws Exception {
         Printer printer = new Printer();
         while (true){
-            printer.setCount(printer.getAction(), printer);
+            printer.command(printer.getAction(), printer);
         }
     }
 
@@ -18,7 +18,7 @@ public class Printer {
         return action.next().charAt(0);
     }
 
-    public void setCount(char button, Printer printer) throws Exception {
+    public void command (char button, Printer printer) throws Exception {
         if (button == 'p'){
             try {
                 if (countOfPaper == 0){
@@ -39,45 +39,46 @@ public class Printer {
                 Scanner refillPrinter = new Scanner(System.in);
                 System.out.print("Введите количество листов, которые нужно загрузить в принтер ");
                 int refillCount = refillPrinter.nextInt();
-                printer.refill(refillCount, maxCountOfPaper);
+                printer.refill(refillCount);
             }
         } else if (button == 'e'){
             System.exit(0);
         }
     }
 
-    public void print (int countOfPaper, int document) throws Exception {
+    public void print(int countOfPaper, int document) throws Exception {
         int i = 1;
-        if (document > countOfPaper){
+        if (document > this.countOfPaper){
             System.out.println("Предупреждение: документ будет напечатан не полностью");
         }
             while (document > 0) {  //выполняем пока док не напечатан полностью
-                if (countOfPaper == 0){
+                isPrint = true;
+                if (this.countOfPaper == 0){
                     System.out.println("Бумага закончилась, документ не напечатан. Не хватило " + document + " листов бумаги");
                     break;
                 }
                 System.out.println("Печать листа " + i);
                 i+=1;
-                countOfPaper -= 1;
+                this.countOfPaper -= 1;
                 document -= 1;
                 Thread.sleep(1000);
-
             }
-
-        System.out.println("Печать завершена");
+            System.out.println("Печать завершена");
+            isPrint = false;
     }
-    public void refill (int refillCount, int maxCountOfPaper){
-        while (refillCount != 0 && countOfPaper < maxCountOfPaper){
-            refillCount -= 1;
-            countOfPaper += 1;
+    public void refill(int refillCount){ //заправка либо заданного количества листов НЕ во время печати, либо одного во время печати
+        if (!isPrint) {
+            while (refillCount != 0 && countOfPaper < maxCountOfPaper) {
+                refillCount -= 1;
+                countOfPaper += 1;
+            }
+        } else {
+            if (countOfPaper <= maxCountOfPaper) {
+                countOfPaper += 1;
+            }
         }
         System.out.println("Принтер заправлен. В лотке " + countOfPaper + " листов бумаги");
     }
 
-  /*  abstract public void refillOneList (int countOfPaper, int maxCountOfPaper){ //загрузка по 1 листу во время печати
-        if (countOfPaper <= maxCountOfPaper){
-            countOfPaper += 1;
-        }
-    }*/
 
 }
